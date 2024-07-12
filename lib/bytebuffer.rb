@@ -1,0 +1,137 @@
+require 'ffi'
+
+module ByteBufferExtension
+  extend FFI::Library
+
+  ffi_lib("ext/libext.#{FFI::Platform::LIBSUFFIX}")
+
+  attach_function(:new, :new, [], :pointer)
+  attach_function(:from_bytes, :from_bytes, [:pointer, :int], :pointer)
+
+  attach_function(:drop, :drop, [:pointer], :void)
+
+  attach_function(:length, :length, [:pointer], :int)
+
+  attach_function(:set_write_position, :set_write_position, [:pointer, :int], :void)
+  attach_function(:set_read_position, :set_read_position, [:pointer, :int], :void)
+  attach_function(:get_write_position, :get_write_position, [:pointer], :int)
+  attach_function(:get_read_position, :get_read_position, [:pointer], :int)
+
+  attach_function(:reset_cursors, :reset_cursors, [:pointer], :void)
+  attach_function(:reset_bits_cursor, :reset_bits_cursor, [:pointer], :void)
+  attach_function(:resize, :resize, [:pointer, :int], :void)
+
+  attach_function(:clear, :clear, [:pointer], :void)
+  attach_function(:is_empty?, :is_empty, [:pointer], :bool)
+
+  attach_function(:read_bit, :read_bit, [:pointer], :bool)
+  attach_function(:read_bits, :read_bits, [:pointer, :int], :long)
+  attach_function(:read_u8, :read_u8, [:pointer], :int)
+  attach_function(:read_i8, :read_i8, [:pointer], :int)
+  attach_function(:read_u16, :read_u16, [:pointer], :int)
+  attach_function(:read_i16, :read_i16, [:pointer], :int)
+  attach_function(:read_u32, :read_u32, [:pointer], :int)
+  attach_function(:read_i32, :read_i32, [:pointer], :int)
+  attach_function(:read_u64, :read_u64, [:pointer], :long)
+  attach_function(:read_i64, :read_i64, [:pointer], :long)
+  attach_function(:read_f32, :read_f32, [:pointer], :float)
+  attach_function(:read_f64, :read_f64, [:pointer], :double)
+
+  attach_function(:write_bit, :write_bit, [:pointer, :bool], :void)
+  attach_function(:write_bits, :write_bits, [:pointer, :int, :int], :void)
+  attach_function(:write_u8, :write_u8, [:pointer, :int], :void)
+  attach_function(:write_i8, :write_i8, [:pointer, :int], :void)
+  attach_function(:write_u16, :write_u16, [:pointer, :int], :void)
+  attach_function(:write_i16, :write_i16, [:pointer, :int], :void)
+  attach_function(:write_u32, :write_u32, [:pointer, :int], :void)
+  attach_function(:write_i32, :write_i32, [:pointer, :int], :void)
+  attach_function(:write_u64, :write_u64, [:pointer, :long], :void)
+  attach_function(:write_i64, :write_i64, [:pointer, :long], :void)
+  attach_function(:write_f32, :write_f32, [:pointer, :float],  :void)
+  attach_function(:write_f64, :write_f64, [:pointer,  :double],  :void)
+end
+
+class ByteBuffer
+
+  # Constructs a new ByteBuffer.
+  def initialize; @ptr = ByteBufferExtension.new; end
+
+  # Returns the length of the ByteBuffer.
+  # @return [Integer] the length
+  def length; ByteBufferExtension.length(@ptr); end
+
+  # Resets the read and write cursor positions.
+  def reset_cursors; ByteBufferExtension.reset_cursors(@ptr); end
+
+  # Resets the bit cursor position.
+  def reset_bits_cursor; ByteBufferExtension.reset_bits_cursor(@ptr); end
+
+  # Clear all bytes from the {ByteBuffer}.
+  def clear; ByteBufferExtension.clear(@ptr); end
+
+  # Is the {ByteBuffer} empty?
+  # @return [Boolean] true if the {ByteBuffer} is empty, false otherwise.
+  def is_empty?; ByteBufferExtension.is_empty?(@ptr); end
+
+  # Resizes the {ByteBuffer} to the desired length.
+  # @note {ByteBuffer}s can only increase in size. Lower or negative sizes will not work.
+  # @param new_size [Integer] the desired length.
+  def resize(new_size)
+    if new_size.negative?
+      raise ArgumentError, "new_size must be positive"
+    else
+      ByteBufferExtension.resize(@ptr, new_size)
+    end
+  end
+
+  # @private
+  def free
+    ByteBufferExtension.drop(@ptr)
+    @ptr = nil # :gottem:
+  end
+
+  # Set the write cursor to the desired position.
+  # @param position [Integer] the desired position.
+  def set_write_position(position); ByteBufferExtension.set_write_position(@ptr, position); end
+
+  # Set the read cursor to the desired position.
+  # @param position [Integer] the desired position.
+  def set_read_position(position); ByteBufferExtension.set_read_position(@ptr, position); end
+
+  # Gets the write cursor's current position.
+  # @return [Integer] the write cursor's position.
+  def get_write_position; ByteBufferExtension.get_write_position(@ptr); end
+
+  # Gets the read cursor's current position.
+  # @return [Integer] the read cursor's position.
+  def get_read_position; ByteBufferExtension.get_read_position(@ptr); end
+
+  def write_bit(value); ByteBufferExtension.write_bit(@ptr, value); end
+  def write_bits(value, amount); ByteBufferExtension.write_bits(@ptr, value, amount); end
+  def write_u8(value); ByteBufferExtension.write_u8(@ptr, value); end
+  def write_i8(value); ByteBufferExtension.write_i8(@ptr, value); end
+  def write_u16(value); ByteBufferExtension.write_u16(@ptr, value); end
+  def write_i16(value); ByteBufferExtension.write_i16(@ptr, value); end
+  def write_u32(value); ByteBufferExtension.write_u32(@ptr, value); end
+  def write_i32(value); ByteBufferExtension.write_i32(@ptr, value); end
+  def write_u64(value); ByteBufferExtension.write_u64(@ptr, value); end
+  def write_i64(value); ByteBufferExtension.write_i64(@ptr, value); end
+  def write_f32(value); ByteBufferExtension.write_f32(@ptr, value); end
+  def write_f64(value); ByteBufferExtension.write_f64(@ptr, value); end
+
+  def read_bit; ByteBufferExtension.read_bit(@ptr); end
+  def read_bits(amount); ByteBufferExtension.read_bits(@ptr, amount); end
+  def read_u8; ByteBufferExtension.read_u8(@ptr); end
+  def read_i8; ByteBufferExtension.read_i8(@ptr); end
+  def read_u16; ByteBufferExtension.read_u16(@ptr); end
+  def read_i16; ByteBufferExtension.read_i16(@ptr); end
+  def read_u32; ByteBufferExtension.read_u32(@ptr); end
+  def read_i32; ByteBufferExtension.read_i32(@ptr); end
+  def read_u64; ByteBufferExtension.read_u64(@ptr); end
+  def read_i64; ByteBufferExtension.read_i64(@ptr); end
+  def read_f32; ByteBufferExtension.read_f32(@ptr); end
+  def read_f64; ByteBufferExtension.read_f64(@ptr); end
+
+  alias_method :drop, :free
+  alias_method :destroy, :free
+end
