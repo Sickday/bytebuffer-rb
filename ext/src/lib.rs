@@ -139,6 +139,7 @@ extern "C" fn write_bit(ptr: *mut ByteBuffer, bit: bool) {
 	}
 }
 
+#[no_mangle]
 extern "C" fn write_bits(ptr: *mut ByteBuffer, value: u64, bits: u8) {
 	match unsafe { raw_pointer_to_ref_mut(ptr) } {
 		Some(buffer) => buffer.write_bits(value, bits),

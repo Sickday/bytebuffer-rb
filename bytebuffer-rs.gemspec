@@ -11,11 +11,8 @@ GEM_SPEC = Gem::Specification.new do |spec|
 
   spec.add_runtime_dependency 'ffi', '~> 1.17'
 
-  spec.add_development_dependency 'benchmark', '~> 0.3'
   spec.add_development_dependency 'rake', '~> 13.0'
   spec.add_development_dependency 'rspec', '~> 3.12'
-  spec.add_development_dependency 'minitest', '~> 5.19'
-  spec.add_development_dependency 'yard', '~> 0.9'
 
   spec.extensions = "ext/extconf.rb"
   spec.require_paths = ['lib']

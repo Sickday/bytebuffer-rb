@@ -1,5 +1,6 @@
 require 'ffi'
 
+# This module extends the FFI::Library to provide functions used to interact with the compiled rust library.
 module ByteBufferExtension
   extend FFI::Library
 
@@ -51,6 +52,7 @@ module ByteBufferExtension
   attach_function(:write_f64, :write_f64, [:pointer,  :double],  :void)
 end
 
+# A {ByteBuffer} provides functions for interacting with buffered IO data. This gem wraps the {bytebuffer} rust crate located at https://github.com/terahlunah/bytebuffer using FFI.
 class ByteBuffer
 
   # Constructs a new ByteBuffer.
@@ -84,7 +86,8 @@ class ByteBuffer
     end
   end
 
-  # @private
+  # Frees the memory allocated for this {ByteBuffer}.
+  # @note This function will invoke the drop() macro in rust, passing in the pointer for the {ByteBuffer}. After the call is made, the pointer is set to `nil`.
   def free
     ByteBufferExtension.drop(@ptr)
     @ptr = nil # :gottem:
@@ -106,30 +109,105 @@ class ByteBuffer
   # @return [Integer] the read cursor's position.
   def get_read_position; ByteBufferExtension.get_read_position(@ptr); end
 
+  # Write a boolean value as a single bit to the {ByteBuffer}.
+  # @param value [Boolean] the value to write.
   def write_bit(value); ByteBufferExtension.write_bit(@ptr, value); end
+
+  # Write a numeric value as a series of bits in the {ByteBuffer}.
+  # @param value [Integer] the value to write.
+  # @param amount [Integer] the amount of bits to use.
   def write_bits(value, amount); ByteBufferExtension.write_bits(@ptr, value, amount); end
+
+  # Write a numeric value as a 8-bit unsigned integer in the {ByteBuffer}.
+  # @param value [Integer] the value to write.
   def write_u8(value); ByteBufferExtension.write_u8(@ptr, value); end
+
+  # Write a numeric value as a 8-bit signed integer in the {ByteBuffer}.
+  # @param value [Integer] the value to write.
   def write_i8(value); ByteBufferExtension.write_i8(@ptr, value); end
+
+  # Write a numeric value as a 16-bit unsigned integer in the {ByteBuffer}.
+  # @param value [Integer] the value to write.
   def write_u16(value); ByteBufferExtension.write_u16(@ptr, value); end
+
+  # Write a numeric value as a 16-bit signed integer in the {ByteBuffer}.
+  # @param value [Integer] the value to write.
   def write_i16(value); ByteBufferExtension.write_i16(@ptr, value); end
+
+  # Write a numeric value as a 32-bit unsigned integer in the {ByteBuffer}.
+  # @param value [Integer] the value to write.
   def write_u32(value); ByteBufferExtension.write_u32(@ptr, value); end
+
+  # Write a numeric value as a 32-bit signed integer in the {ByteBuffer}.
+  # @param value [Integer] the value to write.
   def write_i32(value); ByteBufferExtension.write_i32(@ptr, value); end
+
+  # Write a numeric value as a 64-bit unsigned integer in the {ByteBuffer}.
+  # @param value [Integer] the value to write.
   def write_u64(value); ByteBufferExtension.write_u64(@ptr, value); end
+
+  # Write a numeric value as a 64-bit signed integer in the {ByteBuffer}.
+  # @param value [Integer] the value to write.
   def write_i64(value); ByteBufferExtension.write_i64(@ptr, value); end
+
+  # Write a float value as a 32-bit signed float in the {ByteBuffer}.
+  # @note The C value used is accurate to the nearest millionth decimal place.
+  # @param value [Float] the value to write.
   def write_f32(value); ByteBufferExtension.write_f32(@ptr, value); end
+
+  # Write a float value as a 64-bit signed float in the {ByteBuffer}.
+  # @note The C value used is accurate to the nearest millionth decimal place.
+  # @param value [Float] the value to write.
   def write_f64(value); ByteBufferExtension.write_f64(@ptr, value); end
 
+  # Read a single bit from the {ByteBuffer} as a boolean value.
+  # @return [Boolean] the read value.
   def read_bit; ByteBufferExtension.read_bit(@ptr); end
+
+  # Read a series of bits from the {ByteBuffer} as a single unsigned 64-bit integer.
+  # @return [Integer] the read value.
   def read_bits(amount); ByteBufferExtension.read_bits(@ptr, amount); end
+
+  # Read a single 8-bit unsigned integer from the {ByteBuffer}.
+  # @return [Integer] the read value.
   def read_u8; ByteBufferExtension.read_u8(@ptr); end
+
+  # Read a single 8-bit signed integer from the {ByteBuffer}.
+  # @return [Integer] the read value.
   def read_i8; ByteBufferExtension.read_i8(@ptr); end
+
+  # Read a single 16-bit unsigned integer from the {ByteBuffer}.
+  # @return [Integer] the read value.
   def read_u16; ByteBufferExtension.read_u16(@ptr); end
+
+  # Read a single 16-bit signed integer from the {ByteBuffer}.
+  # @return [Integer] the read value.
   def read_i16; ByteBufferExtension.read_i16(@ptr); end
+
+  # Read a single 32-bit unsigned integer from the {ByteBuffer}.
+  # @return [Integer] the read value.
   def read_u32; ByteBufferExtension.read_u32(@ptr); end
+
+  # Read a single 32-bit signed integer from the {ByteBuffer}.
+  # @return [Integer] the read value.
   def read_i32; ByteBufferExtension.read_i32(@ptr); end
+
+  # Read a single 64-bit unsigned integer from the {ByteBuffer}.
+  # @return [Integer] the read value.
   def read_u64; ByteBufferExtension.read_u64(@ptr); end
+
+  # Read a single 64-bit signed integer from the {ByteBuffer}.
+  # @return [Integer] the read value.
   def read_i64; ByteBufferExtension.read_i64(@ptr); end
+
+  # Read a single 32-bit signed float from the {ByteBuffer}.
+  # @note Float values read from this buffer are accurate to the millionth decimal place.
+  # @return [Float] the read value.
   def read_f32; ByteBufferExtension.read_f32(@ptr); end
+
+  # Read a single 32-bit signed float from the {ByteBuffer}.
+  # @note Float values read from this buffer are accurate to the millionth decimal place.
+  # @return [Float] the read value.
   def read_f64; ByteBufferExtension.read_f64(@ptr); end
 
   alias_method :drop, :free
