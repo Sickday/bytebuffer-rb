@@ -10,26 +10,30 @@ endif
 
 ifeq ($(OS),Windows)
     SUFFIX := dll
+    TARGET := x86_64-pc-windows-msvc
 endif
 ifeq ($(OS),Darwin)
     SUFFIX := dylib
+    TARGET := x86_64-apple-darwin
 endif
 ifeq ($(OS),Linux)
     SUFFIX := so
+    TARGET := x86_64-unknown-linux-gnu
 endif
 ifeq ($(OS),GNU)
     SUFFIX := so
+    TARGET := x86_64-unknown-linux-gnu
 endif
 
 
 all:
-	cargo build --release
+	cargo build --release --target=$(TARGET)
 
 clean:
 	rm -rf target
 
 install:
-	cp target/release/libext.$(SUFFIX) ./
+	cp target/$(TARGET)/release/libext.$(SUFFIX) ./
 
 test:
 	cargo test
