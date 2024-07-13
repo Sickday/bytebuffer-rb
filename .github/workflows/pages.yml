@@ -1,0 +1,47 @@
+---
+name: Build and deploy Yard to Github Pages
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [closed]
+    branches:
+      - main
+  release:
+    types: [released]
+
+permissions:
+  id-token: write
+  contents: read
+  pages: write
+
+jobs:
+  BuildAndPublish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+
+      - name: Build YARD Docs
+        run: bundler exec rake docs:generate
+
+      - name: Upload pages artifact
+        id: upload-artifact
+        uses: actions/upload-pages-artifact@
+        with:
+          name: "yard-docs"
+          path: ./docs/
+          retention-days: "7"
+
+      - name: Deploy pages artifact
+        uses: actions/deploy-pages@v4
+        with:
+          artifact_name: "yard-docs"
