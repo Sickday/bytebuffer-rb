@@ -27,7 +27,9 @@ endif
 
 
 all:
-	cargo build --release --target=$(TARGET)
+	mkdir build
+	echo "Outputting to $PWD /build/$(TARGET)"
+	cargo build --release --target=$(TARGET) --target-dir=./build
 
 clean:
 	rm -rf target
