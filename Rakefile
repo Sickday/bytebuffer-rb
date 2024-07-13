@@ -19,17 +19,13 @@ namespace :gem do
                else 'x86_64-unknown-linux-gnu'
                end
 
-      target_path = "./build/#{target}/release"
+      target_path = "./build/#{target}/release/#{RUBY_PLATFORM.match?(/mswin|mingw/) ? 'ext' : 'libext'}.#{FFI::Platform::LIBSUFFIX}"
 
       FileUtils.mkdir("build")
 
-      puts "Outputting to #{FileUtils.pwd}/build"
-
       system("cargo build --release --target=#{target} --target-dir=#{FileUtils.pwd}/build")
 
-      system("ls -al #{target_path}/**/*")
-
-      FileUtils.cp("#{target_path}/libext.#{FFI::Platform::LIBSUFFIX}", "./")
+      FileUtils.cp(target_path, "./")
     end
   end
 
