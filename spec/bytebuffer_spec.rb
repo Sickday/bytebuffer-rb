@@ -227,12 +227,12 @@ RSpec.describe ByteBuffer do
   describe '#read_i8' do
     it 'reads a single signed 8-bit integer from the ByteBuffer' do
       @buffer = described_class.new
-      @buffer.write_i8(-123)
+      @buffer.write_i8(-100)
       @buffer.write_i8(-116)
       @buffer.write_i8(-64)
       @buffer.write_i8(-99)
 
-      expect(@buffer.read_i8).to eql(-123)
+      expect(@buffer.read_i8).to eql(-100)
       expect(@buffer.read_i8).to eql(-116)
       expect(@buffer.read_i8).to eql(-64)
       expect(@buffer.read_i8).to eql(-99)
@@ -257,12 +257,12 @@ RSpec.describe ByteBuffer do
   describe '#read_i16' do
     it 'reads a single signed 16-bit integer from the ByteBuffer' do
       @buffer = described_class.new
-      @buffer.write_i16(-12_300)
+      @buffer.write_i16(-1_300)
       @buffer.write_i16(-11_600)
       @buffer.write_i16(-640)
       @buffer.write_i16(-990)
 
-      expect(@buffer.read_i16).to eql(-12_300)
+      expect(@buffer.read_i16).to eql(-1_300)
       expect(@buffer.read_i16).to eql(-11_600)
       expect(@buffer.read_i16).to eql(-640)
       expect(@buffer.read_i16).to eql(-990)
