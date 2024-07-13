@@ -87,6 +87,8 @@ jobs:
       - name: Build package gem
         run: bundle exec rake gem:package
 
-      - uses: rubygems/configure-rubygems-credentials@v1.0.0
+      - name: Configure Trusted Publisher
+        uses: rubygems/configure-rubygems-credentials@v1.0.0
+
       - name: Publish Gem
-        uses: gem push pkg/*.gem
+        run: gem push pkg/*.gem
