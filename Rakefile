@@ -20,7 +20,6 @@ namespace :gem do
                end
 
       target_path = "./build/#{target}/release"
-      target_path = "./build/release/build" if target == 'x86_64-pc-windows-msvc'
 
       FileUtils.mkdir("build")
 
@@ -28,7 +27,7 @@ namespace :gem do
 
       system("cargo build --release --target=#{target} --target-dir=#{FileUtils.pwd}/build")
 
-      system("ls -al ./**/*")
+      system("ls -al #{target_path}/**/*")
 
       FileUtils.cp("#{target_path}/libext.#{FFI::Platform::LIBSUFFIX}", "./")
     end
