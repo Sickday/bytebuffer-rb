@@ -13,7 +13,13 @@ namespace :gem do
 
     FileUtils.chdir("ext/") do
       system("cargo build --release")
-      system("cp target/release/libext.#{FFI::Platform::LIBSUFFIX} ./")
+      target = case RUBY_PLATFORM
+               when /darwin/ then 'aarch64-apple-darwin'
+               when /linux/ then 'x86_64-unknown-linux-gnu'
+               when /mswin/ then 'x86_64-pc-windows-msvc'
+               else 'x86_64-unknown-linux-gnu'
+               end
+      system("cp target/#{target}/release/libext.#{FFI::Platform::LIBSUFFIX} ./")
     end
   end
 

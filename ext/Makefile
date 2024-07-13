@@ -14,7 +14,7 @@ ifeq ($(OS),Windows)
 endif
 ifeq ($(OS),Darwin)
     SUFFIX := dylib
-    TARGET := x86_64-apple-darwin
+    TARGET := aarch64-apple-darwin
 endif
 ifeq ($(OS),Linux)
     SUFFIX := so
