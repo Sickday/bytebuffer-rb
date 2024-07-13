@@ -20,7 +20,7 @@ namespace :gem do
                end
       FileUtils.mkdir("build")
       puts "Outputting to #{FileUtils.pwd}/build"
-      system("cargo build --release --target=#{target} --target=#{FileUtils.pwd}/build")
+      system("cargo build --release --target=#{target} --target-dir=#{FileUtils.pwd}/build")
       system("cp #{FileUtils.pwd}/build/#{target}/release/libext.#{FFI::Platform::LIBSUFFIX} ./")
     end
   end
