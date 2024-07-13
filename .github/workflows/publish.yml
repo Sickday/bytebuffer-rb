@@ -84,10 +84,5 @@ jobs:
           name: extension-macos
           path: ext/libext.dylib
 
-      - name: Configure RubyGems Credentials
-        uses: rubygems/configure-rubygems-credentials@main
-        with:
-          role-to-assume: rg_oidc_akr_f55fe1127adjkkcn8ty6
-
       - name: Publish Gem
         uses: rubygems/release-gem@v1
