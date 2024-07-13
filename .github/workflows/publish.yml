@@ -70,19 +70,19 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: extension-linux
-          path: ext/libext.so
+          path: "./ext/libext.so"
 
       - name: Download build windows artifacts
         uses: actions/download-artifact@v4
         with:
           name: extension-windows
-          path: ext/libext.dll
+          path: "./ext/libext.dll"
 
       - name: Download build macos artifacts
         uses: actions/download-artifact@v4
         with:
           name: extension-macos
-          path: ext/libext.dylib
+          path: "./ext/libext.dylib"
 
       - name: Build package gem
         run: bundle exec rake gem:package
