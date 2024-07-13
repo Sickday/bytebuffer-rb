@@ -19,8 +19,8 @@ namespace :gem do
                else 'x86_64-unknown-linux-gnu'
                end
 
-      target_path = "./build/#{target}/release/"
-      target_path = "./build/release/" if target == 'x86_64-pc-windows-msvc'
+      target_path = "./build/#{target}/release"
+      target_path = "./build/release" if target == 'x86_64-pc-windows-msvc'
 
       FileUtils.mkdir("build")
 
