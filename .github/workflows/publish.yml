@@ -82,4 +82,6 @@ jobs:
           name: extension-macos
 
       - name: Publish Gem
-        uses: rubygems/release-gem@v1
+        run: |
+          bundle exec rake gem:package
+          bundle exec gem push pkg/*.gem
