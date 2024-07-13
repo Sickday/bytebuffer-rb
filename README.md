@@ -1,3 +1,5 @@
+[![Gem Version](https://badge.fury.io/rb/bytebuffer.svg)](https://badge.fury.io/rb/bytebuffer)
+
 # ByteBuffer
 The `ByteBuffer` Ruby gem provides a powerful and flexible interface for buffered IO data, wrapping the [bytebuffer](https://crates.io/crates/bytebuffer) crate using FFI.
 

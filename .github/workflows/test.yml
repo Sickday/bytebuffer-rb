@@ -1,0 +1,39 @@
+---
+name: Rspec and Cargo Test
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  BuildAndTest:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      max-parallel: 3
+      matrix:
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+      - run: bundle install
+
+      - name: Setup Rust
+        uses: hecrj/setup-rust-action@v2
+        with:
+          rust-version: stable
+
+      - name: Build extension
+        run: bundle exec rake gem:build
+
+      - name: Run Rspec
+        run: bundle exec rake test:rspec
+
+      - name: Run Cargo test
+        run: bundle exec rake test:ext

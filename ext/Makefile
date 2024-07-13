@@ -11,31 +11,33 @@ endif
 ifeq ($(OS),Windows)
     SUFFIX := dll
     TARGET := x86_64-pc-windows-msvc
+    TARGET_PATH    := target/$(TARGET)/release/ext.$(SUFFIX)
 endif
 ifeq ($(OS),Darwin)
     SUFFIX := dylib
     TARGET := aarch64-apple-darwin
+    TARGET_PATH   := target/$(TARGET)/release/libext.$(SUFFIX)
 endif
 ifeq ($(OS),Linux)
     SUFFIX := so
     TARGET := x86_64-unknown-linux-gnu
+    TARGET_PATH  := target/$(TARGET)/release/libext.$(SUFFIX)
 endif
 ifeq ($(OS),GNU)
     SUFFIX := so
     TARGET := x86_64-unknown-linux-gnu
+    TARGET_PATH := target/$(TARGET)/release/libext.$(SUFFIX)
 endif
 
 
 all:
-	mkdir build
-	echo "Outputting to $PWD /build/$(TARGET)"
-	cargo build --release --target=$(TARGET) --target-dir=./build
+	cargo build --release --target=$(TARGET)
 
 clean:
 	rm -rf target
 
 install:
-	cp target/$(TARGET)/release/libext.$(SUFFIX) ./
+	cp $(TARGET_PATH) ./libext.$(SUFFIX)
 
 test:
 	cargo test
