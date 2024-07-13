@@ -15,13 +15,13 @@ jobs:
         include:
           - os: windows-latest
             name: windows
-            path: ".\ext\release\libext.dll"
+            path: "ext/libext.dll"
           - os: ubuntu-latest
             name: linux
-            path: "ext/release/libext.so"
+            path: "ext/libext.so"
           - os: macos-latest
             name: macos
-            suffix: "ext/release/libext.dylib"
+            suffix: "ext/libext.dylib"
     steps:
       - uses: actions/checkout@v4
 
