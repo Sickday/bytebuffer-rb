@@ -12,13 +12,13 @@ namespace :gem do
     raise "Install rustc along with Cargo before running this rake task." if !system('cargo --version') || !system('rustc --version')
 
     FileUtils.chdir("ext/") do
-      system("cargo build --release")
       target = case RUBY_PLATFORM
                when /darwin/ then 'aarch64-apple-darwin'
                when /linux/ then 'x86_64-unknown-linux-gnu'
-               when /mswin/ then 'x86_64-pc-windows-msvc'
+               when /mswin|mingw/ then 'x86_64-pc-windows-msvc'
                else 'x86_64-unknown-linux-gnu'
                end
+      system("cargo build --release --target=#{target}")
       system("cp target/#{target}/release/libext.#{FFI::Platform::LIBSUFFIX} ./")
     end
   end
@@ -31,7 +31,7 @@ namespace :gem do
 
   desc 'Package the Gem package'
   task :package do
-    load('bytebuffer-rs.gemspec')
+    load('bytebuffer.gemspec')
 
     Gem::PackageTask.new(GEM_SPEC) do |pkg|
       pkg.need_tar_bz2 = true

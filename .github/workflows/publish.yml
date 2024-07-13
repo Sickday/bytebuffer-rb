@@ -15,13 +15,13 @@ jobs:
         include:
           - os: windows-latest
             name: windows
-            suffix: dll
+            path: ".\ext\release\libext.dll"
           - os: ubuntu-latest
             name: linux
-            suffix: so
+            path: "ext/release/libext.so"
           - os: macos-latest
             name: macos
-            suffix: dylib
+            suffix: "ext/release/libext.dylib"
     steps:
       - uses: actions/checkout@v4
 
@@ -43,7 +43,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: extension-${{ matrix.name }}
-          path: ext/libext.${{ matrix.suffix }}
+          path: ${{ matrix.path }}
 
   Publish:
     runs-on: ubuntu-latest
