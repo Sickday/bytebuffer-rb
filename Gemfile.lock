@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    bytebuffer (0.1.0)
+    bytebuffer (0.1.2)
       ffi (~> 1.17)
 
 GEM
