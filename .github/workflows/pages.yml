@@ -1,5 +1,5 @@
 ---
-name: Build and deploy Yard to Github Pages
+name: YARD to GitHub Pages
 
 on:
   workflow_dispatch:
