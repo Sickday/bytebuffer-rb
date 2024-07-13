@@ -18,11 +18,19 @@ namespace :gem do
                when /mswin|mingw/ then 'x86_64-pc-windows-msvc'
                else 'x86_64-unknown-linux-gnu'
                end
+
+      target_path = "./build/#{target}/release/"
+      target_path = "./build/release/" if target == 'x86_64-pc-windows-msvc'
+
       FileUtils.mkdir("build")
+
       puts "Outputting to #{FileUtils.pwd}/build"
+
       system("cargo build --release --target=#{target} --target-dir=#{FileUtils.pwd}/build")
-      puts "C: #{Dir["#{FileUtils.pwd}/build/*"].join("\n")}"
-      system("cp #{FileUtils.pwd}/build/#{target}/release/libext.#{FFI::Platform::LIBSUFFIX} ./")
+
+      puts "C: #{Dir["#{target_path}/*"].join("\n")}"
+
+      FileUtils.cp("#{target_path}/libext.#{FFI::Platform::LIBSUFFIX}", "./")
     end
   end
 
