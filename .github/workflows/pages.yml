@@ -3,13 +3,6 @@ name: YARD to GitHub Pages
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
-  pull_request:
-    types: [closed]
-    branches:
-      - main
   release:
     types: [released]
 
