@@ -35,7 +35,7 @@ jobs:
 
       - name: Upload pages artifact
         id: upload-artifact
-        uses: actions/upload-pages-artifact@
+        uses: actions/upload-pages-artifact@v3
         with:
           name: "yard-docs"
           path: ./docs/
