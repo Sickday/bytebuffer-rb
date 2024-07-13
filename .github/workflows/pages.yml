@@ -38,7 +38,7 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           name: "yard-docs"
-          path: ./docs/
+          path: ./doc/
           retention-days: "7"
 
       - name: Deploy pages artifact
