@@ -10,6 +10,10 @@ The following packages are required to build and use the gem:
 * `rustc`
 * `cargo`
 
+Ensure the following toolchains are installed via rustup:
+* `x86_64-unknown-linux-gnu`
+* 
+
 #### Usage
 A basic example of the ByteBuffer in action can be found below:
 ```ruby

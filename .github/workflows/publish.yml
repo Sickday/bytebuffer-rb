@@ -1,0 +1,84 @@
+---
+name: Publish Gem
+
+on:
+  workflow_dispatch:
+  release:
+    types: [released]
+
+jobs:
+  Build:
+    runs-on: ${{ matrix.os.image }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        include:
+          - os: windows-latest
+            name: windows
+            suffix: dll
+          - os: ubuntu-latest
+            name: linux
+            suffix: so
+          - os: macos-latest
+            name: macos
+            suffix: dylib
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+
+      - name: Setup Rust
+        uses: hecrj/setup-rust-action@v2
+        with:
+          rust-version: stable
+
+      - name: Build extension
+        run: bundle exec rake gem:build
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: extension-${{ matrix.name }}
+          path: ext/libext.${{ matrix.suffix }}
+
+  Publish:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+
+      - name: Setup Rust
+        uses: hecrj/setup-rust-action@v2
+        with:
+          rust-version: stable
+
+      - name: Download build linux artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: extension-linux
+
+      - name: Download build windows artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: extension-windows
+
+      - name: Download build macos artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: extension-macos
+
+      - name: Package Gem
+        uses: rubygems/release-gem@v1

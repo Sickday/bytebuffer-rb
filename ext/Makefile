@@ -1,23 +1,23 @@
 ifeq '$(findstring ;,$(PATH))' ';'
-    detected_OS := Windows
+    OS := Windows
 else
-    detected_OS := $(shell uname 2>/dev/null || echo Unknown)
-    detected_OS := $(patsubst CYGWIN%,Cygwin,$(detected_OS))
-    detected_OS := $(patsubst MSYS%,MSYS,$(detected_OS))
-    detected_OS := $(patsubst MINGW%,MSYS,$(detected_OS))
+    OS := $(shell uname 2>/dev/null || echo Unknown)
+    OS := $(patsubst CYGWIN%,Cygwin,$(OS))
+    OS := $(patsubst MSYS%,MSYS,$(OS))
+    OS := $(patsubst MINGW%,MSYS,$(OS))
 endif
 
 
-ifeq ($(detected_OS),Windows)
+ifeq ($(OS),Windows)
     SUFFIX := dll
 endif
-ifeq ($(detected_OS),Darwin)        # Mac OS X
+ifeq ($(OS),Darwin)
     SUFFIX := dylib
 endif
-ifeq ($(detected_OS),Linux)
+ifeq ($(OS),Linux)
     SUFFIX := so
 endif
-ifeq ($(detected_OS),GNU)           # Debian GNU Hurd
+ifeq ($(OS),GNU)
     SUFFIX := so
 endif
 
@@ -34,10 +34,18 @@ install:
 test:
 	cargo test
 
-build-release-macos:
-	cargo build --release
-	cp target/release/libext.dylib ./
+build-macos-amd64:
+	cargo build --release --target=x86_64-apple-darwin
+	cp target/x86_64-apple-darwin/release/libext.dylib ./
 
-build-release-linux:
-	cargo build --release
-	cp target/release/libext.so ./
+build-macos-aarch:
+	cargo build --release --target=aarch64-apple-darwin
+	cp target/aarch64-apple-darwin/release/libext.dylib  ./
+
+build-linux:
+	cargo build --release --target=x86_64-unknown-linux-gnu
+	cp target/x86_64-unknown-linux-gnu/release/libext.so ./
+
+build-windows:
+	cargo build --release --target=x86_64-pc-windows-msvc
+	cp target/x86_64-pc-windows-msvc/release/libext.dll  ./

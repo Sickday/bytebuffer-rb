@@ -1,6 +1,8 @@
+require_relative 'lib/bytebuffer/version'
+
 GEM_SPEC = Gem::Specification.new do |spec|
-  spec.name = 'bytebuffer-rs'
-  spec.version = ENV['GEM_VERSION'] || '0.0.0'
+  spec.name = 'bytebuffer'
+  spec.version = ByteBuffer::VERSION
   spec.summary = 'A gem wrapping the bytebuffer crate using FFI.'
   spec.description = 'A gem that provides a ByteBuffer class based on the bytebuffer rust crate.'
   spec.license = 'BSD-3-Clause'

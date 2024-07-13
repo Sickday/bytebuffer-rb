@@ -1,4 +1,5 @@
 require 'ffi'
+require_relative 'bytebuffer/version'
 
 # This module extends the FFI::Library to provide functions used to interact with the compiled rust library.
 module ByteBufferExtension
@@ -54,6 +55,8 @@ end
 
 # A {ByteBuffer} provides functions for interacting with buffered IO data. This gem wraps the {bytebuffer} rust crate located at https://github.com/terahlunah/bytebuffer using FFI.
 class ByteBuffer
+
+
 
   # Constructs a new ByteBuffer.
   def initialize; @ptr = ByteBufferExtension.new; end
