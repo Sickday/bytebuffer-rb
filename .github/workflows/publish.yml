@@ -81,5 +81,5 @@ jobs:
         with:
           name: extension-macos
 
-      - name: Package Gem
+      - name: Publish Gem
         uses: rubygems/release-gem@v1

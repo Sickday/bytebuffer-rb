@@ -25,7 +25,7 @@ namespace :gem do
 
       system("cargo build --release --target=#{target} --target-dir=#{FileUtils.pwd}/build")
 
-      FileUtils.cp(target_path, "./")
+      FileUtils.cp(target_path, "./libext.#{FFI::Platform::LIBSUFFIX}")
     end
   end
 
