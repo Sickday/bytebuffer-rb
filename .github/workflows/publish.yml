@@ -84,19 +84,9 @@ jobs:
           name: extension-macos
           path: ext/libext.dylib
 
-      - name: Set remote URL
-        run: |
-          # Attribute commits to the last committer on HEAD
-          git config --global user.email "$(git log -1 --pretty=format:'%ae')"
-          git config --global user.name "$(git log -1 --pretty=format:'%an')"
-          git remote set-url origin "https://x-access-token:${{ github.token }}@github.com/$GITHUB_REPOSITORY"
-        shell: bash
+      - name: Build package gem
+        run: bundle exec rake gem:package
 
-      - name: Add and commit extensions
-        run: |
-          git add ext/libext.dll ext/libext.dylib ext/libext.so
-          git commit -m "Update extension"
-          git push origin main
-
+      - uses: rubygems/configure-rubygems-credentials@v1.0.0
       - name: Publish Gem
-        uses: rubygems/release-gem@v1
+        uses: gem push pkg/*.gem
