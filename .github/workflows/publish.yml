@@ -90,6 +90,4 @@ jobs:
           role-to-assume: rg_oidc_akr_f55fe1127adjkkcn8ty6
 
       - name: Publish Gem
-        run: |
-          bundle exec rake gem:package
-          bundle exec gem push pkg/*.gem
+        uses: rubygems/release-gem@v1
