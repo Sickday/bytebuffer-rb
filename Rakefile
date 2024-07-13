@@ -20,7 +20,7 @@ namespace :gem do
                end
 
       target_path = "./build/#{target}/release"
-      target_path = "./build/release" if target == 'x86_64-pc-windows-msvc'
+      target_path = "./build/release/build" if target == 'x86_64-pc-windows-msvc'
 
       FileUtils.mkdir("build")
 
@@ -28,7 +28,7 @@ namespace :gem do
 
       system("cargo build --release --target=#{target} --target-dir=#{FileUtils.pwd}/build")
 
-      puts "C: #{Dir["#{target_path}/*"].join("\n")}"
+      system("ls -al ./**/*")
 
       FileUtils.cp("#{target_path}/libext.#{FFI::Platform::LIBSUFFIX}", "./")
     end
@@ -37,7 +37,7 @@ namespace :gem do
   desc 'Clean up the Gem build environment.'
   task :clean do
     FileUtils.rm_rf('pkg/')
-    FileUtils.rm_rf('ext/target/')
+    FileUtils.rm_rf('ext/build/')
   end
 
   desc 'Package the Gem package'
