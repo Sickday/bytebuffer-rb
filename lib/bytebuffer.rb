@@ -5,7 +5,7 @@ require_relative 'bytebuffer/version'
 module ByteBufferExtension
   extend FFI::Library
 
-  ffi_lib("ext/libext.#{FFI::Platform::LIBSUFFIX}")
+  ffi_lib ["libext.#{FFI::Platform::LIBSUFFIX}"]
 
   attach_function(:new, :new, [], :pointer)
   attach_function(:from_bytes, :from_bytes, [:pointer, :int], :pointer)

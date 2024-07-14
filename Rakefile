@@ -12,33 +12,20 @@ namespace :gem do
   task :build do
     raise "Install rustc along with Cargo before running this rake task." if !system('cargo --version') || !system('rustc --version')
 
-    FileUtils.chdir("ext/") do
-      target = case RUBY_PLATFORM
-               when /darwin/ then 'aarch64-apple-darwin'
-               when /linux/ then 'x86_64-unknown-linux-gnu'
-               when /mswin|mingw/ then 'x86_64-pc-windows-msvc'
-               else 'x86_64-unknown-linux-gnu'
-               end
-
-      target_path = "./build/#{target}/release/#{RUBY_PLATFORM.match?(/mswin|mingw/) ? 'ext' : 'libext'}.#{FFI::Platform::LIBSUFFIX}"
-
-      FileUtils.mkdir("build")
-
-      system("cargo build --release --target=#{target} --target-dir=#{FileUtils.pwd}/build")
-
-      FileUtils.cp(target_path, "./libext.#{FFI::Platform::LIBSUFFIX}")
+    FileUtils.chdir("ext/bytebuffer") do
+      system("cargo build --release")
     end
   end
 
   desc 'Clean up the Gem build environment.'
   task :clean do
     FileUtils.rm_rf('pkg/')
-    FileUtils.rm_rf('ext/build/')
+    FileUtils.rm_rf('ext/bytebuffer/build/')
   end
 
   desc 'Package the Gem package'
   task :package do
-    load('bytebuffer.gemspec')
+    #load('bytebuffer.gemspec')
 
     Gem::PackageTask.new(GEM_SPEC) do |pkg|
       pkg.need_tar_bz2 = true
@@ -53,7 +40,7 @@ namespace :docs do
 
   YARD::Rake::YardocTask.new do |t|
     t.name = 'generate'
-    t.files = ['lib/**/*.rb']
+    t.files = %w(lib/**/*.rb)
   end
 
   task serve: %i[docs:generate] do
@@ -83,7 +70,7 @@ namespace :test do
   task :ext do
     raise "Install rustc along with Cargo before running this rake task." if !system('cargo --version') || !system('rustc --version')
 
-    FileUtils.chdir("ext/") do
+    FileUtils.chdir("ext/bytebuffer") do
       system("cargo test")
     end
   end
