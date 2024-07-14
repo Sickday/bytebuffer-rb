@@ -19,5 +19,5 @@ GEM_SPEC = Gem::Specification.new do |spec|
   spec.extensions = "ext/extconf.rb"
   spec.require_paths = ['lib']
 
-  spec.files = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) } + Dir["ext/*.so"] + Dir["ext/*.dylib"] + Dir["ext/*.dll"]
+  spec.files = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
 end
