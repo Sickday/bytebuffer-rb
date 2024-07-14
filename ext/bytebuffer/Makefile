@@ -37,7 +37,7 @@ clean:
 	rm -rf target
 
 install:
-	cp $(TARGET_PATH) ./libext.$(SUFFIX)
+	cp $(TARGET_PATH) ../../libext.$(SUFFIX)
 
 test:
 	cargo test
