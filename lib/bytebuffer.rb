@@ -8,7 +8,6 @@ module ByteBufferExtension
   case FFI::Platform::OS
   when 'linux' then ffi_lib ["#{File.dirname(__FILE__)}/bytebuffer.so"]
   when 'darwin' then ffi_lib ["#{File.dirname(__FILE__)}/bytebuffer.bundle"]
-  when 'windows' then ffi_lib ["#{File.dirname(__FILE__)}/bytebuffer.dll"]
   else ffi_lib ["#{File.dirname(__FILE__)}/bytebuffer.so"]
   end
 

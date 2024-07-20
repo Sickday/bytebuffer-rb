@@ -12,14 +12,13 @@ GEM_SPEC = Gem::Specification.load('bytebuffer.gemspec')
 
 namespace :gem do
 
-  desc 'Clean up the Gem build environment. Note: This command indiscriminately removes all .so, .dll, and .bundle files in subdirectories.'
+  desc 'Clean up the Gem build environment. Note: This command indiscriminately removes all .so, and .bundle files in subdirectories.'
   task :clean do
     FileUtils.rm_rf(%w(./tmp ./pkg ./target))
 
     case FFI::Platform::OS
     when 'linux' then FileUtils.rm_r(Dir['./**/*.so'])
     when 'darwin' then FileUtils.rm_r(Dir['./**/*.bundle'])
-    when 'windows' then FileUtils.rm_r(Dir['./**/*.dll'])
     else system("rm -r ./**/*.so")
     end
   end
@@ -32,7 +31,6 @@ namespace :gem do
       ext.cross_platform = %w[
         aarch64-linux
         arm64-darwin
-        x64-mingw-ucrt
         x86_64-darwin
         x86_64-linux
         x86_64-linux-musl
@@ -51,7 +49,6 @@ namespace :gem do
     target = case RUBY_PLATFORM
              when /darwin/ then 'darwin'
              when /linux/ then 'linux'
-             when /mswin|mingw/ then 'windows'
              end
     patch_dir = "#{working_dir}/lib/bytebuffer/patch/#{target}"
     unless !File.directory?(patch_dir) || Dir.empty?(patch_dir)
@@ -70,12 +67,8 @@ namespace :gem do
   task :revert do
     working_dir = File.dirname(__FILE__)
     target = case RUBY_PLATFORM
-             when /darwin/
-               'darwin'
-             when /linux/
-               'linux'
-             when /mswin|mingw/
-               'windows'
+             when /darwin/ then 'darwin'
+             when /linux/ then 'linux'
              end
 
     FileUtils.chdir("#{working_dir}/lib/bytebuffer/patch/#{target}") do |dir|
