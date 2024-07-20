@@ -3,43 +3,84 @@ require 'bundler/gem_tasks'
 require 'ffi'
 require 'rake'
 require 'rake/testtask'
+require 'rb_sys/extensiontask'
 require 'rspec/core/rake_task'
 require 'rubygems'
 require 'rubygems/package_task'
 
+GEM_SPEC = Gem::Specification.load('bytebuffer.gemspec')
+
 namespace :gem do
-  desc 'Build the Gem extensions'
-  task :build do
-    raise "Install rustc along with Cargo before running this rake task." if !system('cargo --version') || !system('rustc --version')
 
-    FileUtils.chdir("ext/") do
-      target = case RUBY_PLATFORM
-               when /darwin/ then 'aarch64-apple-darwin'
-               when /linux/ then 'x86_64-unknown-linux-gnu'
-               when /mswin|mingw/ then 'x86_64-pc-windows-msvc'
-               else 'x86_64-unknown-linux-gnu'
-               end
+  desc 'Clean up the Gem build environment. Note: This command indiscriminately removes all .so, and .bundle files in subdirectories.'
+  task :clean do
+    FileUtils.rm_rf(%w(./tmp ./pkg ./target))
 
-      target_path = "./build/#{target}/release/#{RUBY_PLATFORM.match?(/mswin|mingw/) ? 'ext' : 'libext'}.#{FFI::Platform::LIBSUFFIX}"
-
-      FileUtils.mkdir("build")
-
-      system("cargo build --release --target=#{target} --target-dir=#{FileUtils.pwd}/build")
-
-      FileUtils.cp(target_path, "./libext.#{FFI::Platform::LIBSUFFIX}")
+    case FFI::Platform::OS
+    when 'linux' then FileUtils.rm_r(Dir['./**/*.so'])
+    when 'darwin' then FileUtils.rm_r(Dir['./**/*.bundle'])
+    else system("rm -r ./**/*.so")
     end
   end
 
-  desc 'Clean up the Gem build environment.'
-  task :clean do
-    FileUtils.rm_rf('pkg/')
-    FileUtils.rm_rf('ext/build/')
+  desc 'Compile and install the native extension'
+  task compile: %i(clean) do
+    RbSys::ExtensionTask.new('bytebuffer', GEM_SPEC) do |ext|
+      ext.source_pattern = "*.{rs,toml,lock,rb}"
+      ext.ext_dir = "#{File.dirname(__FILE__)}/ext/bytebuffer"
+      ext.cross_platform = %w[
+        aarch64-linux
+        arm64-darwin
+        x86_64-darwin
+        x86_64-linux
+        x86_64-linux-musl
+      ]
+
+      ext.cross_compile = true
+      ext.lib_dir = "lib"
+    end
+
+    Rake::Task["compile"].invoke
+  end
+
+  desc 'Apply platform patches'
+  task :patch do
+    working_dir = File.dirname(__FILE__)
+    target = case RUBY_PLATFORM
+             when /darwin/ then 'darwin'
+             when /linux/ then 'linux'
+             end
+    patch_dir = "#{working_dir}/lib/bytebuffer/patch/#{target}"
+    unless !File.directory?(patch_dir) || Dir.empty?(patch_dir)
+      puts "Applying platform patches for #{target}"
+
+      FileUtils.chdir(patch_dir) do |dir|
+        Dir["#{dir}/*.patch"].sort.each do |patch|
+          puts "Applying patch: #{patch}"
+          system("patch #{working_dir}/lib/bytebuffer.rb #{patch}")
+        end
+      end
+    end
+  end
+
+  desc 'Revert platform patches'
+  task :revert do
+    working_dir = File.dirname(__FILE__)
+    target = case RUBY_PLATFORM
+             when /darwin/ then 'darwin'
+             when /linux/ then 'linux'
+             end
+
+    FileUtils.chdir("#{working_dir}/lib/bytebuffer/patch/#{target}") do |dir|
+      Dir["#{dir}/*.patch"].sort.each do |patch|
+        puts "Applying patch: #{patch}"
+        system("patch -R #{working_dir}/lib/bytebuffer.rb #{patch}")
+      end
+    end
   end
 
   desc 'Package the Gem package'
-  task :package do
-    load('bytebuffer.gemspec')
-
+  task package: %i(compile gem:patch) do
     Gem::PackageTask.new(GEM_SPEC) do |pkg|
       pkg.need_tar_bz2 = true
     end
@@ -53,7 +94,7 @@ namespace :docs do
 
   YARD::Rake::YardocTask.new do |t|
     t.name = 'generate'
-    t.files = ['lib/**/*.rb']
+    t.files = %w(lib/**/*.rb)
   end
 
   task serve: %i[docs:generate] do
@@ -83,8 +124,6 @@ namespace :test do
   task :ext do
     raise "Install rustc along with Cargo before running this rake task." if !system('cargo --version') || !system('rustc --version')
 
-    FileUtils.chdir("ext/") do
-      system("cargo test")
-    end
+    system("cargo test")
   end
 end

@@ -14,9 +14,11 @@ jobs:
     strategy:
       max-parallel: 3
       matrix:
-        os: [ ubuntu-latest, windows-latest, macos-latest ]
+        os: [ ubuntu-latest, macos-latest ]
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
 
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
@@ -30,7 +32,9 @@ jobs:
           rust-version: stable
 
       - name: Build extension
-        run: bundle exec rake gem:build
+        run: |
+          bundle exec rake gem:compile
+          bundle exec rake gem:patch
 
       - name: Run Rspec
         run: bundle exec rake test:rspec

@@ -1,1 +1,0 @@
-raise 'Install Rust with Cargo from https://www.rust-lang.org/ before installing this gem.' if !system('cargo --version') || !system('rustc --version')
