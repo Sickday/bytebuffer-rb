@@ -55,7 +55,7 @@ namespace :gem do
              when /mswin|mingw/ then 'windows'
              end
     patch_dir = "#{working_dir}/lib/bytebuffer/patch/#{target}"
-    unless Dir.empty?(patch_dir)
+    unless Dir.empty?(patch_dir) || !File.directory?(patch_dir)
       puts "Applying platform patches for #{target}"
 
       FileUtils.chdir(patch_dir) do |dir|
