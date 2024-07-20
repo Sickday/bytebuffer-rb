@@ -32,7 +32,9 @@ jobs:
           rust-version: stable
 
       - name: Build extension
-        run: bundle exec rake gem:compile
+        run: |
+          bundle exec rake gem:compile
+          bundle exec rake gem:patch
 
       - name: Run Rspec
         run: bundle exec rake test:rspec
