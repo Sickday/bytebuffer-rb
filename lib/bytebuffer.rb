@@ -5,7 +5,12 @@ require_relative 'bytebuffer/version'
 module ByteBufferExtension
   extend FFI::Library
 
-  ffi_lib ["libext.#{FFI::Platform::LIBSUFFIX}"]
+  case FFI::Platform::OS
+  when 'linux' then ffi_lib ["#{File.dirname(__FILE__)}/bytebuffer.so"]
+  when 'darwin' then ffi_lib ["#{File.dirname(__FILE__)}/bytebuffer.bundle"]
+  when 'windows' then ffi_lib ["#{File.dirname(__FILE__)}/bytebuffer.dll"]
+  else ffi_lib ["#{File.dirname(__FILE__)}/bytebuffer.so"]
+  end
 
   attach_function(:new, :new, [], :pointer)
   attach_function(:from_bytes, :from_bytes, [:pointer, :int], :pointer)

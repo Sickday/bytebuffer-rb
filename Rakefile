@@ -3,30 +3,52 @@ require 'bundler/gem_tasks'
 require 'ffi'
 require 'rake'
 require 'rake/testtask'
+require 'rb_sys/extensiontask'
 require 'rspec/core/rake_task'
 require 'rubygems'
 require 'rubygems/package_task'
 
-namespace :gem do
-  desc 'Build the Gem extensions'
-  task :build do
-    raise "Install rustc along with Cargo before running this rake task." if !system('cargo --version') || !system('rustc --version')
+GEM_SPEC = Gem::Specification.load('bytebuffer.gemspec')
 
-    FileUtils.chdir("ext/bytebuffer") do
-      system("cargo build --release")
+namespace :gem do
+
+  desc 'Clean up the Gem build environment. Note: This command indiscriminately removes all .so, .dll, and .bundle files in subdirectories.'
+  task :clean do
+    FileUtils.rm_rf('./pkg/')
+    FileUtils.rm_rf('./ext/bytebuffer/target/*')
+
+    case FFI::Platform::OS
+    when 'linux' then FileUtils.rm_r(Dir['./**/*.so'])
+    when 'darwin' then FileUtils.rm_r(Dir['./**/*.bundle'])
+    when 'windows' then FileUtils.rm_r(Dir['./**/*.dll'])
+    else system("rm -r ./**/*.so")
     end
   end
 
-  desc 'Clean up the Gem build environment.'
-  task :clean do
-    FileUtils.rm_rf('pkg/')
-    FileUtils.rm_rf('ext/bytebuffer/build/')
+  desc 'Compile and install the native extension'
+  task compile: %i(clean) do
+    RbSys::ExtensionTask.new('bytebuffer', GEM_SPEC) do |ext|
+      ext.source_pattern = "*.{rs,toml,lock,rb}"
+      ext.ext_dir = "#{File.dirname(__FILE__)}/ext/bytebuffer"
+      ext.cross_platform = %w[
+        aarch64-linux
+        arm64-darwin
+        x64-mingw-ucrt
+        x64-mingw32
+        x86_64-darwin
+        x86_64-linux
+        x86_64-linux-musl
+      ]
+
+      ext.cross_compile = true
+      ext.lib_dir = "lib"
+    end
+
+    Rake::Task["compile"].invoke
   end
 
   desc 'Package the Gem package'
-  task :package do
-    #load('bytebuffer.gemspec')
-
+  task package: %i(compile) do
     Gem::PackageTask.new(GEM_SPEC) do |pkg|
       pkg.need_tar_bz2 = true
     end
@@ -70,8 +92,6 @@ namespace :test do
   task :ext do
     raise "Install rustc along with Cargo before running this rake task." if !system('cargo --version') || !system('rustc --version')
 
-    FileUtils.chdir("ext/bytebuffer") do
-      system("cargo test")
-    end
+    system("cargo test")
   end
 end

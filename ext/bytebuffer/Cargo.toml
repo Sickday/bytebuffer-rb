@@ -1,7 +1,9 @@
 [package]
-name = "ext"
+name = "bytebuffer"
 version = "0.1.0"
 edition = "2021"
+authors = ["Patrick Worlds <sickday@pm.me>"]
+publish = false
 
 [lib]
 crate-type = ["cdylib"]
