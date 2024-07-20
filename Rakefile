@@ -14,8 +14,7 @@ namespace :gem do
 
   desc 'Clean up the Gem build environment. Note: This command indiscriminately removes all .so, .dll, and .bundle files in subdirectories.'
   task :clean do
-    FileUtils.rm_rf('./pkg/')
-    FileUtils.rm_rf('./ext/bytebuffer/target/*')
+    FileUtils.rm_rf(%w(./tmp ./pkg ./target))
 
     case FFI::Platform::OS
     when 'linux' then FileUtils.rm_r(Dir['./**/*.so'])
@@ -47,8 +46,45 @@ namespace :gem do
     Rake::Task["compile"].invoke
   end
 
+  desc 'Apply platform patches'
+  task :patch do
+    working_dir = File.dirname(__FILE__)
+    target = case RUBY_PLATFORM
+             when /darwin/ then 'darwin'
+             when /linux/ then 'linux'
+             when /mswin|mingw/ then 'windows'
+             end
+
+    FileUtils.chdir("#{working_dir}/lib/bytebuffer/patch/#{target}") do |dir|
+      Dir["#{dir}/*.patch"].sort.each do |patch|
+        puts "Applying patch: #{patch}"
+        system("patch #{working_dir}/lib/bytebuffer.rb #{patch}")
+      end
+    end
+  end
+
+  desc 'Revert platform patches'
+  task :revert do
+    working_dir = File.dirname(__FILE__)
+    target = case RUBY_PLATFORM
+             when /darwin/
+               'darwin'
+             when /linux/
+               'linux'
+             when /mswin|mingw/
+               'windows'
+             end
+
+    FileUtils.chdir("#{working_dir}/lib/bytebuffer/patch/#{target}") do |dir|
+      Dir["#{dir}/*.patch"].sort.each do |patch|
+        puts "Applying patch: #{patch}"
+        system("patch -R #{working_dir}/lib/bytebuffer.rb #{patch}")
+      end
+    end
+  end
+
   desc 'Package the Gem package'
-  task package: %i(compile) do
+  task package: %i(compile gem:patch) do
     Gem::PackageTask.new(GEM_SPEC) do |pkg|
       pkg.need_tar_bz2 = true
     end
