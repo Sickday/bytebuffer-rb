@@ -54,11 +54,15 @@ namespace :gem do
              when /linux/ then 'linux'
              when /mswin|mingw/ then 'windows'
              end
+    patch_dir = "#{working_dir}/lib/bytebuffer/patch/#{target}"
+    unless Dir.empty?(patch_dir)
+      puts "Applying platform patches for #{target}"
 
-    FileUtils.chdir("#{working_dir}/lib/bytebuffer/patch/#{target}") do |dir|
-      Dir["#{dir}/*.patch"].sort.each do |patch|
-        puts "Applying patch: #{patch}"
-        system("patch #{working_dir}/lib/bytebuffer.rb #{patch}")
+      FileUtils.chdir(patch_dir) do |dir|
+        Dir["#{dir}/*.patch"].sort.each do |patch|
+          puts "Applying patch: #{patch}"
+          system("patch #{working_dir}/lib/bytebuffer.rb #{patch}")
+        end
       end
     end
   end
